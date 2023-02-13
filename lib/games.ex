@@ -12,7 +12,7 @@ defmodule Games do
       :world
 
   """
-  def hello do
-    :world
+  def play_guessing_game do
+    Games.GuessingGame.play()
   end
 end
