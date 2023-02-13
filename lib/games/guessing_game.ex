@@ -1,8 +1,4 @@
 defmodule Games.GuessingGame do
-  # Generate a random number between 1 - 10
-  # take a guess between 1 and 10
-  # if guess != our ?random #
-  # return Incorrect!
   def play do
     correct_guess = Enum.random(1..10)
     IO.inspect(correct_guess, label: "correct_guess")
