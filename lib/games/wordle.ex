@@ -85,41 +85,4 @@ defmodule Games.Wordle do
     end)
     |> Enum.unzip()
   end
-
-  # guess
-  # |> checkgreen()
-  # |> checkyellow()
-  # |> checkgray
-  # end)
-
-  # check_guess(guess, answer) do
-  #   #1 return [:green]
-  #   #2 return ;gray]
-  #   #3 check each value and return a composit list
-  #   ## go through and 1..5
-  # end
-
-  # Enum.map(0..4, fn index ->
-  #   cond do
-  #     Enum.at(guess_letters, index) not in answer_letters ->
-  #       :gray
-
-  #     Enum.at(guess_letters, index) == Enum.at(answer_letters, index) ->
-  #       :green
-
-  #     # Enum.at(guess_letters, index) in answer_letters and
-  #     #     Enum.at(guess_letters, index) == Enum.at(answer_letters, index) ->
-  #     #   :gray
-
-  #     Enum.at(guess_letters, index) != Enum.at(answer_letters, index) ->
-  #       :yellow
-  #   end
-  # end)
-  # end
 end
-
-# only one letter exists in answer. If two of the same letters ex
-
-# if letter exists, is there multiple instances, is it at index? if no, gray.
-# if letter exists, are they both at index? both green
-# if letter exists,
