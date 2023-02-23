@@ -1,4 +1,17 @@
 defmodule Games.GuessingGame do
+  @moduledoc """
+  Game where player need to guess the right number to win.
+  """
+
+  @doc """
+  Displays the game prompt in the players terminal.
+
+    ## Example
+
+    ```elixir
+        iex> Game.GuessingGame.play()
+    ```
+  """
   def play do
     correct_guess = Enum.random(1..10)
     IO.inspect(correct_guess, label: "correct_guess")

@@ -17,18 +17,15 @@ defmodule Games.Wordle do
     #### if value at index i is not the same return yellow
     # Output: a list of 5 atoms consisting of :green, :yellow, :gray
 
-    {answers, guesses} =
+    {answer, guess} =
       {answer, guess}
       |> strings_to_list()
       |> replace_w_green()
       |> replace_w_yellow()
+      |> replace_w_gray()
       |> IO.inspect(label: "guess")
 
-    # |> IO.inspect(label: "Pipeline output")
-
-    # |> graycheck()
-
-    # IO.inspect(guesses, label: "Guesses")
+    guess
   end
 
   def strings_to_list({answer, guess}) do
@@ -46,19 +43,8 @@ defmodule Games.Wordle do
       else
         acc ++ [{answer, guess}]
       end
-
-      # |> IO.inspect(label: "Enum.reduce")
     end)
     |> Enum.unzip()
-
-    # |> Enum.map(fn {answer, guess} ->
-    #   if answer == guess do
-    #     {:green, :green}
-    #   else
-    #     {answer, guess}
-    #   end
-    # end)
-    # |> Enum.unzip()
   end
 
   # input
