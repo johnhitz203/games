@@ -3,107 +3,114 @@ defmodule Games.WordleTest do
   doctest Games.Wordle
   alias Games.Wordle
 
-  test "replace_w_green/1 all green" do
-    assert Wordle.replace_w_green({["a", "a", "a", "a", "a"], ["a", "a", "a", "a", "a"]}) ==
-             {[nil, nil, nil, nil, nil], [:green, :green, :green, :green, :green]}
+  test "zip lists with indices" do
+    assert Wordle.zip_w_indices(
+             String.graphemes("pzazz"),
+             String.graphemes("spazz")
+           ) == [
+             {{"p", "s"}, 0},
+             {{"z", "p"}, 1},
+             {{"a", "a"}, 2},
+             {{"z", "z"}, 3},
+             {{"z", "z"}, 4}
+           ]
   end
 
-  test "replace_w_green/1 no green" do
-    assert Wordle.replace_w_green({["a", "a", "a", "a", "a"], ["b", "b", "b", "b", "b"]}) ==
-             {["a", "a", "a", "a", "a"], ["b", "b", "b", "b", "b"]}
+  test "get list of green letter tuples" do
+    assert Wordle.collect_green_letters([
+             {{"p", "s"}, 0},
+             {{"z", "p"}, 1},
+             {{"a", "a"}, 2},
+             {{"z", "z"}, 3},
+             {{"z", "z"}, 4}
+           ]) == [
+             {{"a", "a"}, 2},
+             {{"z", "z"}, 3},
+             {{"z", "z"}, 4}
+           ]
   end
 
-  test "replace_w_green/1 one green at index 0" do
-    assert Wordle.replace_w_green({["a", "a", "a", "a", "a"], ["a", "b", "b", "b", "b"]}) ==
-             {[nil, "a", "a", "a", "a"], [:green, "b", "b", "b", "b"]}
+  test "get list of gray letter tuples" do
+    assert Wordle.collect_gray_letters(
+             [
+               {{"p", "s"}, 0},
+               {{"z", "p"}, 1},
+               {{"a", "a"}, 2},
+               {{"z", "z"}, 3},
+               {{"z", "z"}, 4}
+             ],
+             ["p", "z", "a", "z", "z"]
+           ) == [{{"p", "s"}, 0}]
   end
 
-  test "replace_w_green/1 one green at index 1" do
-    assert Wordle.replace_w_green({["b", "a", "b", "b", "b"], ["a", "a", "a", "a", "a"]}) ==
-             {["b", nil, "b", "b", "b"], ["a", :green, "a", "a", "a"]}
+  test "feedback/2 mix of green, gray, and yellow" do
+    assert Games.Wordle.feedback("pzazz", "spazz") == %{
+             0 => {"s", :gray},
+             1 => {"p", :yellow},
+             2 => {"a", :green},
+             3 => {"z", :green},
+             4 => {"z", :green}
+           }
   end
 
-  test "replace_w_yellow/1 all yellow" do
-    assert Games.Wordle.replace_w_yellow({["a", "b", "c", "d", "e"], ["e", "c", "d", "b", "a"]}) ==
-             {[nil, nil, nil, nil, nil],
-              [
-                :yellow,
-                :yellow,
-                :yellow,
-                :yellow,
-                :yellow
-              ]}
+  test "feedback/2 all yellow" do
+    assert Games.Wordle.feedback("abcde", "ecdba") == %{
+             0 => {"e", :yellow},
+             1 => {"c", :yellow},
+             2 => {"d", :yellow},
+             3 => {"b", :yellow},
+             4 => {"a", :yellow}
+           }
   end
 
-  test "replace_w_yellow/1 yellow at index 0 and 3" do
-    assert Games.Wordle.replace_w_yellow({["a", "b", "c", "b", "b"], ["c", "e", "a", "e", "e"]}) ==
-             {[nil, "b", nil, "b", "b"],
-              [
-                :yellow,
-                "e",
-                :yellow,
-                "e",
-                "e"
-              ]}
+  test "feedback/2 all gray" do
+    assert Games.Wordle.feedback("aaaaa", "bbbbb") == %{
+             0 => {"b", :gray},
+             1 => {"b", :gray},
+             2 => {"b", :gray},
+             3 => {"b", :gray},
+             4 => {"b", :gray}
+           }
   end
 
-  test "replace_w_gray/1 all gray" do
-    assert Games.Wordle.replace_w_gray({["a", "a", "a", "a", "a"], ["b", "b", "b", "b", "b"]}) ==
-             {[nil, nil, nil, nil, nil],
-              [
-                :gray,
-                :gray,
-                :gray,
-                :gray,
-                :gray
-              ]}
+  test "feedback/2 all green" do
+    assert Games.Wordle.feedback("aaaaa", "aaaaa") == %{
+             0 => {"a", :green},
+             1 => {"a", :green},
+             2 => {"a", :green},
+             3 => {"a", :green},
+             4 => {"a", :green}
+           }
   end
-
-  # test "feedback/2 all green" do
-  #   assert Games.Wordle.feedback("abcde", "abcde") == [:green, :green, :green, :green, :green]
-  # end
-
-  # test "feedback/2 all yellow" do
-  #   assert Games.Wordle.feedback("abcde", "ecdba") == [
-  #            :yellow,
-  #            :yellow,
-  #            :yellow,
-  #            :yellow,
-  #            :yellow
-  #          ]
-  # end
-
-  # test "feedback/2 all gray" do
-  #   assert Games.Wordle.feedback("aaaaa", "bbbbb") == [:gray, :gray, :gray, :gray, :gray]
-  # end
-
-  # test "feedback/2 mixed green and gray" do
-  #   assert Games.Wordle.feedback("abcde", "abfgh") == [:green, :green, :gray, :gray, :gray]
-  # end
-
-  # test "feedback/2 mixed green and yellow" do
-  #   assert Games.Wordle.feedback("abcde", "acbde") == [:green, :yellow, :yellow, :green, :green]
-  # end
-
-  # test "feedback/2 yellow and gray" do
-  #   assert Games.Wordle.feedback("acbad", "bfabf") == [:yellow, :gray, :yellow, :yellow, :gray]
-  # end
-
-  # test "feedback/2 mixed green, yellow, and gray" do
-  #   assert Games.Wordle.feedback("abcdf", "bacdl") == [:yellow, :yellow, :green, :green, :gray]
-  # end
-
-  # test "feedback/2 guess has extra char that matches" do
-  #   assert Games.Wordle.feedback("abcdf", "bacda") == [:yellow, :yellow, :green, :green, :gray]
-  # end
-
-  # test "feedback/2 all yellow" do
-  #   assert Games.Wordle.feedback("ababa", "babab") == [
-  #            :yellow,
-  #            :yellow,
-  #            :yellow,
-  #            :yellow,
-  #            :gray
-  #          ]
-  # end
 end
+
+# test "feedback/2 mixed green and gray" do
+#   assert Games.Wordle.feedback("abcde", "abfgh") == [:green, :green, :gray, :gray, :gray]
+# end
+
+# test "feedback/2 mixed green and yellow" do
+#   assert Games.Wordle.feedback("abcde", "acbde") == [:green, :yellow, :yellow, :green, :green]
+# end
+
+# test "feedback/2 yellow and gray" do
+#   assert Games.Wordle.feedback("acbad", "bfabf") == [:yellow, :gray, :yellow, :yellow, :gray]
+# end
+
+# test "feedback/2 mixed green, yellow, and gray" do
+#   assert Games.Wordle.feedback("abcdf", "bacdl") == [:yellow, :yellow, :green, :green, :gray]
+# end
+
+# test "feedback/2 guess has extra char that matches" do
+#   assert Games.Wordle.feedback("abcdf", "bacda") == [:yellow, :yellow, :green, :green, :gray]
+# end
+
+# test "feedback/2 all yellow" do
+#   assert Games.Wordle.feedback("ababa", "babab") == [
+#            :yellow,
+#            :yellow,
+#            :yellow,
+#            :yellow,
+#            :gray
+#          ]
+# end
+# end

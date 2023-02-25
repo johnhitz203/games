@@ -17,72 +17,150 @@ defmodule Games.Wordle do
     #### if value at index i is not the same return yellow
     # Output: a list of 5 atoms consisting of :green, :yellow, :gray
 
-    {answers, guesses} =
-      {answer, guess}
-      |> strings_to_list()
-      |> replace_w_green()
-      |> replace_w_yellow()
-      |> IO.inspect(label: "guess")
+    # letters_with_indices = zip_answer_w_guess_w_indices(answer, guess)
 
-    # |> IO.inspect(label: "Pipeline output")
+    # green_letters =
+    #   filter_for_green(letters_with_indices)
+    #   |> IO.inspect()
 
-    # |> graycheck()
+    # gray_letters = filter_for_gray
 
-    # IO.inspect(guesses, label: "Guesses")
+    # {answer, guess}
+    # |> get_input_lists()
+    # |> IO.inspect(label: "feedback pipe")
+
+    # |> get_answer_guess_tuples_w_index()
+
+    answer_list = String.graphemes(answer)
+    # |> IO.inspect(label: "answer list")
+
+    guess_list = String.graphemes(guess)
+
+    zip_list = zip_w_indices(answer_list, guess_list)
+    # |> IO.inspect(label: "zip")
+
+    green_letters = collect_green_letters(zip_list)
+    # |> IO.inspect(label: "green feedback")
+
+    gray_letters = collect_gray_letters(zip_list, answer_list)
+    # |> IO.inspect(label: "gray feedback")
+
+    #       answer list: ["w", "h", "e", "r", "e"]
+    #       green feedback: [{{"w", "w"}, 0}, {{"r", "r"}, 3}]
+    #       gray feedback: [{{"e", "a"}, 2}, {{"e", "s"}, 4}]
+    # yellow feedback: ["w", "h", "e", "r", "e"]
+
+    yellow_and_gray_letters = zip_list -- green_letters
+    # |> IO.inspect(label: "yellow and gray feedback")
+
+    yellow_letters = yellow_and_gray_letters -- gray_letters
+    # |> IO.inspect(label: "yellow")
+
+    # name? build_feedback_map vs. build_feedback
+    # Does including map make this too restrictive?
+    # ie, it may turn out later that this returns something
+    # other than a map.
+    build_feedback(green_letters, gray_letters, yellow_letters)
+
+    # map = %{}
+
+    # map =
+    #   Enum.reduce(green_letters, map, fn {{a, g}, i}, map ->
+    #     Map.put(map, i, {g, :green})
+    #   end)
+
+    # map =
+    #   Enum.reduce(gray_letters, map, fn {{a, g}, i}, map ->
+    #     Map.put(map, i, {g, :gray})
+    #   end)
+
+    # map =
+    #   Enum.reduce(yellow_letters, map, fn {{a, g}, i}, map ->
+    #     Map.put(map, i, {g, :yellow})
+    #   end)
+
+    # |> IO.inspect(label: "Map")
   end
 
-  def strings_to_list({answer, guess}) do
-    {
-      String.split(answer, "", trim: true),
-      String.split(guess, "", trim: true)
-    }
+  def build_feedback(green_letters, gray_letters, yellow_letters) do
+    map = %{}
+
+    map =
+      Enum.reduce(green_letters, map, fn {{a, g}, i}, map ->
+        Map.put(map, i, {g, :green})
+      end)
+
+    map =
+      Enum.reduce(gray_letters, map, fn {{a, g}, i}, map ->
+        Map.put(map, i, {g, :gray})
+      end)
+
+    map =
+      Enum.reduce(yellow_letters, map, fn {{a, g}, i}, map ->
+        Map.put(map, i, {g, :yellow})
+      end)
   end
 
-  def replace_w_green({answers, guesses}) do
-    Enum.zip(answers, guesses)
-    |> Enum.reduce([], fn {answer, guess}, acc ->
-      if answer == guess do
-        acc ++ [{nil, :green}]
-      else
-        acc ++ [{answer, guess}]
-      end
+  ###### Helpers ######
 
-      # |> IO.inspect(label: "Enum.reduce")
+  def zip_w_indices(answer_list, guess_list) do
+    Enum.zip(answer_list, guess_list)
+    |> Enum.with_index()
+  end
+
+  def collect_green_letters(list_of_tuples) do
+    # for {{l, l}, _} = t <- list_of_tuples, do: t
+    Enum.filter(list_of_tuples, fn {{a, g}, _} ->
+      a == g
     end)
-    |> Enum.unzip()
-
-    # |> Enum.map(fn {answer, guess} ->
-    #   if answer == guess do
-    #     {:green, :green}
-    #   else
-    #     {answer, guess}
-    #   end
-    # end)
-    # |> Enum.unzip()
   end
 
-  # input
-  def replace_w_yellow({answers, guesses}) do
-    Enum.zip(answers, guesses)
-    |> Enum.reduce([], fn {answer, guess}, acc ->
-      if guess in answers do
-        acc ++ [{nil, :yellow}]
-      else
-        acc ++ [{answer, guess}]
-      end
+  def collect_gray_letters(list_of_tuples, answer_list) do
+    Enum.filter(list_of_tuples, fn {{_a, g}, _} ->
+      g not in answer_list
     end)
-    |> Enum.unzip()
   end
 
-  def replace_w_gray({answers, guesses}) do
-    Enum.zip(answers, guesses)
-    |> Enum.reduce([], fn {answer, guess}, acc ->
-      if guess not in answers do
-        acc ++ [{nil, :gray}]
-      else
-        acc ++ [{answer, guess}]
-      end
-    end)
-    |> Enum.unzip()
-  end
+  # def zip_lists_w_indices({answer_list, guess_list} = _lists) do
+  #   Enum
+  # end
+
+  # def get_input_lists({answer, guess} = _words) do
+  #   {
+  #     String.graphemes(answer),
+  #     String.graphemes(guess)
+  #   }
+  # end
+
+  # def get_answer_guess_tuples_w_index({answer_list, guess_list} = _lists) do
+  #   Enum.zip(answer_list, guess_list)
+  #   |> Enum.with_index()
+  # end
+
+  # def filter_for_green(
+  #       match_indices = [
+  #         {{_answer_0, _guess_0}, 0},
+  #         {{_answer_1, _guess_1}, 1},
+  #         {{_answer_2, _guess_2}, 2},
+  #         {{_answer_3, _guess_3}, 3},
+  #         {{_answer_4, _guess_4}, 4}
+  #       ]
+  #     ) do
+  #   for {{l, l}, _i} = m <- match_indices, do: m
+  # end
+
+  # def filter_for_gray(
+  #       match_indices = [
+  #         {{_answer_0, _guess_0}, 0},
+  #         {{_answer_1, _guess_1}, 1},
+  #         {{_answer_2, _guess_2}, 2},
+  #         {{_answer_3, _guess_3}, 3},
+  #         {{_answer_4, _guess_4}, 4}
+  #       ]
+  #     ) do
+  #   for {{_, g}, _i} = m <- match_indices, do: g != m
+  # Enum.filter(match_indices, fn x ->
+  #   {{a, g}, i} not in x
+  # end)
+  # end
 end
