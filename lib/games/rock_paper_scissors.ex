@@ -1,9 +1,9 @@
 defmodule Games.RockPaperScissors do
   def play do
     ai_guess = Enum.random(["rock", "paper", "scissors"])
-    IO.inspect(ai_guess, label: "ai_guess")
+    # IO.inspect(ai_guess, label: "ai_guess")
 
-    IO.inspect(binding())
+    # IO.inspect(binding())
 
     guess =
       IO.gets("Pick rock, paper, scissors ")

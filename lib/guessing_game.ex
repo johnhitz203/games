@@ -5,7 +5,8 @@ defmodule GuessingGame do
   # return Incorrect!
   def play do
     correct_guess = Enum.random(1..10)
-    IO.inspect(correct_guess)
+    # IO.inspect(correct_guess)
+
     # IO.gets("Enter a guess between 1 and 10: ")
     # case guess do
   end
