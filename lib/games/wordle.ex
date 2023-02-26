@@ -2,24 +2,25 @@ defmodule Games.Wordle do
   @moduledoc """
   Game where player tries to guess a random 5 letter word by placing letters in boxes that represent letters in the word.
   """
-  def feedback(answer, guess) do
+  def feedback({answer, guess}) do
     answer_list = String.graphemes(answer)
     guess_list = String.graphemes(guess)
 
-    zip_list = zip_w_indices(answer_list, guess_list)
-    # |> IO.inspect(label: "zip")
-
-    green_letters = collect_green_letters(zip_list)
-    # |> IO.inspect(label: "collect green letters")
-
-    gray_letters = collect_gray_letters(zip_list, answer_list)
-
-    yellow_letters = (zip_list -- green_letters) -- gray_letters
-
-    build_feedback(green_letters, gray_letters, yellow_letters)
+    {answer_list, guess_list}
+    |> zip_w_indices()
+    |> collate_letters(answer_list)
+    |> build_feedback()
   end
 
-  defp build_feedback(green_letters, gray_letters, yellow_letters) do
+  defp collate_letters(zip_list, answer_list) do
+    green_letters = collect_green_letters(zip_list)
+    gray_letters = collect_gray_letters(zip_list, answer_list)
+    yellow_letters = (zip_list -- green_letters) -- gray_letters
+
+    {green_letters, gray_letters, yellow_letters}
+  end
+
+  defp build_feedback({green_letters, gray_letters, yellow_letters}) do
     map = %{}
 
     map =
@@ -39,7 +40,7 @@ defmodule Games.Wordle do
 
   ###### Helpers ######
 
-  defp zip_w_indices(answer_list, guess_list) do
+  defp zip_w_indices({answer_list, guess_list}) do
     Enum.zip(answer_list, guess_list)
     |> Enum.with_index()
   end
@@ -57,5 +58,7 @@ defmodule Games.Wordle do
     Enum.filter(list_of_tuples, fn {{_a, g}, _} ->
       g not in answer_list
     end)
+
+    # for {{_a, g}, _} <- list_of_tuples, do: g not in answer_list
   end
 end

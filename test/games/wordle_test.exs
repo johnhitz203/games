@@ -3,9 +3,9 @@ defmodule Games.WordleTest do
   doctest Games.Wordle
   alias Games.Wordle
 
-  describe "feedback/2" do
-    test "feedback/2 mix of green, gray, and yellow" do
-      assert Games.Wordle.feedback("pzazz", "spazz") == %{
+  describe "feedback/1" do
+    test "feedback/1 mix of green, gray, and yellow" do
+      assert Games.Wordle.feedback({"pzazz", "spazz"}) == %{
                0 => {"s", :gray},
                1 => {"p", :yellow},
                2 => {"a", :green},
@@ -14,8 +14,8 @@ defmodule Games.WordleTest do
              }
     end
 
-    test "feedback/2 all yellow" do
-      assert Games.Wordle.feedback("abcde", "ecdba") == %{
+    test "feedback/1 all yellow" do
+      assert Games.Wordle.feedback({"abcde", "ecdba"}) == %{
                0 => {"e", :yellow},
                1 => {"c", :yellow},
                2 => {"d", :yellow},
@@ -24,8 +24,8 @@ defmodule Games.WordleTest do
              }
     end
 
-    test "feedback/2 all gray" do
-      assert Games.Wordle.feedback("aaaaa", "bbbbb") == %{
+    test "feedback/1 all gray" do
+      assert Games.Wordle.feedback({"aaaaa", "bbbbb"}) == %{
                0 => {"b", :gray},
                1 => {"b", :gray},
                2 => {"b", :gray},
@@ -34,8 +34,8 @@ defmodule Games.WordleTest do
              }
     end
 
-    test "feedback/2 all green" do
-      assert Games.Wordle.feedback("aaaaa", "aaaaa") == %{
+    test "feedback/1 all green" do
+      assert Games.Wordle.feedback({"aaaaa", "aaaaa"}) == %{
                0 => {"a", :green},
                1 => {"a", :green},
                2 => {"a", :green},
